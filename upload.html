@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project Media Upload</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- <link rel="stylesheet" href="assets/css/style.css"> -->
+
+  <style>
+    body { background: #f4f6f9; }
+    .main-wrapper { min-height: 100vh; }
+    .navbar-custom {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 12px 24px;
+      background: #fff;
+      border-bottom: 1px solid #e6e9ef;
+    }
+    .navbar-left, .navbar-actions, .table-filter-group {
+      display: flex;
+      align-items: center;
+    }
+    .navbar-search-wrapper, .table-search-box {
+      display: flex;
+      align-items: center;
+      background: #f4f6f9;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+    }
+    .navbar-search-wrapper { max-width: 420px; width: 35%; }
+    .navbar-search-input, .table-search-input {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      outline: none;
+      padding: 9px 12px;
+    }
+    .navbar-search-btn {
+      border: 0;
+      background: transparent;
+      padding: 8px 12px;
+    }
+    .navbar-action-btn, .btn-desktop-toggle, .sidebar-toggle-btn, .btn-quick-action,
+    .btn-table-action {
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      border-radius: 8px;
+      padding: 8px 12px;
+    }
+    .navbar-profile-btn {
+      border: 0;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .navbar-profile-img {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .navbar-action-badge {
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      background: #dc3545;
+      border-radius: 50%;
+    }
+    .notification-header, .notification-item, .notification-footer {
+      display: flex;
+      align-items: center;
+    }
+    .notification-header { justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #eee; }
+    .notification-item { gap: 10px; padding: 12px 16px; text-decoration: none; color: inherit; border-bottom: 1px solid #eee; }
+    .notification-content { flex: 1; }
+    .notification-text { margin: 0; }
+    .notification-time { font-size: 12px; color: #777; }
+    .notification-icon { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; }
+    .notification-footer { justify-content: center; padding: 12px; text-decoration: none; }
+    .page-header { background: #fff; }
+    .table-card-custom {
+      margin: 0 24px 24px;
+      background: #fff;
+      border: 1px solid #e6e9ef;
+      border-radius: 10px;
+    }
+    .table-header-control {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid #eee;
+    }
+    .table-search-box { max-width: 300px; width: 100%; }
+    .table-search-icon { margin-left: 12px; color: #8792a2; }
+    .media-preview {
+      width: 72px;
+      height: 52px;
+      border-radius: 6px;
+      object-fit: cover;
+      background: #eee;
+    }
+    .media-icon-preview {
+      display: grid;
+      place-items: center;
+      color: #6c757d;
+      font-size: 24px;
+    }
+    .footer-custom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 20px 24px;
+      border-top: 1px solid #e6e9ef;
+      background: #fff;
+    }
+    .footer-links { list-style: none; display: flex; gap: 16px; margin: 0; padding: 0; }
+    .footer-link { text-decoration: none; color: #6c757d; }
+    .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #198754; }
+    @media (max-width: 768px) {
+      .navbar-search-wrapper { display: none; }
+      .navbar-profile-name { display: none; }
+      .table-header-control, .footer-custom { flex-direction: column; align-items: stretch; }
+      .footer-links { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+
+<body style="display:none">
+  <div class="main-wrapper">
+    <!--header class="navbar-custom">
+      <div class="navbar-left">
+        <button class="btn-desktop-toggle d-none d-xl-flex align-items-center justify-content-center me-2" aria-label="Minimize Sidebar">
+          <i class="bi bi-chevron-bar-left"></i>
+        </button>
+
+        <button class="sidebar-toggle-btn me-2" aria-label="Toggle Navigation">
+          <i class="bi bi-list"></i>
+        </button>
+
+        <div class="dropdown">
+          <button class="btn-quick-action dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="bi bi-plus-lg"></i> Create
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#"><i class="bi bi-file-earmark-plus me-2"></i>New Project</a></li>
+            <li><a class="dropdown-item" href="#"><i class="bi bi-person-plus me-2"></i>New User</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="navbar-search-wrapper">
+        <input type="search" class="navbar-search-input" placeholder="Search anything..." id="main-search">
+        <button class="navbar-search-btn" type="button" aria-label="Search">
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+
+      <div class="navbar-actions">
+        <button class="navbar-action-btn me-1" type="button" id="btn-fullscreen" aria-label="Toggle Fullscreen">
+          <i class="bi bi-arrows-fullscreen"></i>
+        </button>
+
+        <div class="dropdown">
+          <button class="navbar-action-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-label="Notifications">
+            <i class="bi bi-bell"></i>
+          </button>
+          <div class="dropdown-menu dropdown-menu-end dropdown-menu-notification p-0">
+            <div class="notification-header">
+              <h6 class="notification-title mb-0">Notifications</h6>
+              <button class="btn btn-sm btn-link" type="button">Mark all read</button>
+            </div>
+            <a href="#" class="notification-item">
+              <div class="notification-icon bg-success text-white"><i class="bi bi-cloud-check"></i></div>
+              <div class="notification-content">
+                <p class="notification-text">Project media is ready</p>
+                <span class="notification-time">Just now</span>
+              </div>
+            </a>
+            <a href="#" class="notification-footer">View all notifications</a>
+          </div>
+        </div>
+
+        <div class="dropdown ms-2">
+          <button class="navbar-profile-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <img src="assets/images/avatar.png" alt="Administrator" class="navbar-profile-img"
+                 onerror="this.src='https://ui-avatars.com/api/?name=Administrator&background=0d6efd&color=fff'">
+            <span class="navbar-profile-name d-none d-md-inline">Administrator</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>My Account</a></li>
+            <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="page-login.html"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header-->
+
+    <div id="index-header-slot"></div>
+
+    <div class="page-header py-4 mb-4 border-bottom">
+      <div class="container-fluid">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <h1 class="page-title mb-1">Project Table</h1>
+            <p class="page-subtitle mb-0">Photos &amp; Videos • Uploaded to the project page</p>
+          </div>
+          <div class="col-md-6 text-md-end mt-3 mt-md-0">
+            <div class="d-flex align-items-center justify-content-md-end gap-2 flex-wrap">
+              <a href="projects.html" class="btn btn-outline-secondary">
+                <i class="bi bi-grid me-2"></i>View Projects
+              </a>
+              <div class="table-search-box">
+                <i class="bi bi-search table-search-icon"></i>
+                <input type="text" class="table-search-input" id="headerMediaSearch"
+                       placeholder="Search project media..." aria-label="Search project media">
+              </div>
+              <button class="btn btn-primary" type="button" data-bs-toggle="modal"
+                      data-bs-target="#uploadProjectMediaModal">
+                <i class="bi bi-upload me-2"></i>Upload New Project
+              </button>
+              <button id="clerk-signout-button" type="button"
+                      class="btn btn-outline-danger">
+                <i class="bi bi-box-arrow-right me-2"></i>Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="uploadProjectMediaModal" tabindex="-1" aria-labelledby="uploadProjectMediaModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="uploadMediaForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="uploadProjectMediaModalLabel">Upload Project Media</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="projectMediaInput" class="form-label">Choose image or video</label>
+              <input id="projectMediaInput" type="file" class="form-control" accept="image/*,video/*" required>
+            </div>
+            <div class="mb-3">
+              <label for="projectMediaTitle" class="form-label">Project title</label>
+              <input id="projectMediaTitle" type="text" class="form-control" placeholder="Enter title">
+            </div>
+            <div class="mb-3">
+              <label for="projectMediaLocation" class="form-label">Location</label>
+              <input id="projectMediaLocation" type="text" class="form-control" placeholder="Enter location">
+            </div>
+            <div class="alert alert-danger d-none" id="uploadError"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Upload</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal fade" id="editProjectMediaModal" tabindex="-1" aria-labelledby="editProjectMediaModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editProjectMediaModalLabel">Edit Project Media</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="editProjectId">
+            <div class="mb-3">
+              <label for="editProjectTitle" class="form-label">Title</label>
+              <input id="editProjectTitle" type="text" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label for="editProjectLocation" class="form-label">Location</label>
+              <input id="editProjectLocation" type="text" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label for="editProjectType" class="form-label">Type</label>
+              <select id="editProjectType" class="form-select">
+                <option value="Photo">Photo</option>
+                <option value="Video">Video</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button id="saveProjectEditButton" type="button" class="btn btn-primary">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="deleteProjectMediaModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+          <div class="modal-body text-center py-4">
+            <i class="bi bi-trash3 text-danger fs-1"></i>
+            <h5 class="mt-3">Delete this media?</h5>
+            <p class="text-muted mb-0">This action cannot be undone.</p>
+            <input type="hidden" id="deleteProjectId">
+          </div>
+          <div class="modal-footer justify-content-center">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button id="confirmProjectDeleteButton" type="button" class="btn btn-danger">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-card-custom">
+      <div class="table-header-control">
+        <div class="table-search-box">
+          <i class="bi bi-search table-search-icon"></i>
+          <input type="text" class="table-search-input" id="tableMediaSearch" placeholder="Search project media...">
+        </div>
+        <div class="table-filter-group">
+          <button class="btn-table-action" type="button" id="exportMediaButton">
+            <i class="bi bi-file-earmark-arrow-down me-1"></i>Export
+          </button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th scope="col" class="ps-3">Media</th>
+              <th scope="col">Name</th>
+              <th scope="col">Location</th>
+              <th scope="col">Type</th>
+              <th scope="col">Uploaded</th>
+              <th scope="col" class="text-end pe-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="projectMediaTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer class="footer-custom">
+      <div class="footer-left">
+        <span class="footer-logo"><i class="bi bi-asterisk"></i> Beljo Corporation</span>
+      </div>
+      <div class="footer-right">
+        <ul class="footer-links">
+          <li><a href="#" class="footer-link">Overview</a></li>
+          <li><a href="project.html" class="footer-link">Projects</a></li>
+          <li><a href="#" class="footer-link">Status <span class="status-dot"></span></a></li>
+        </ul>
+      </div>
+    </footer>
+  </div>
+
+  <script
+    crossorigin="anonymous"
+    data-clerk-publishable-key="pk_test_c3dlZXBpbmctc2hyaW1wLTcyMzAuY2xlcmsuYWNjb3VudHMuZGV2JA"
+    src="https://sweeping-shrimp-7230.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js">
+  </script>
+
+  <script>
+    async function enforceClerkSession() {
+      if (!window.Clerk) {
+        window.location.replace("projects.html");
+        return;
+      }
+
+      await window.Clerk.load();
+
+      if (!window.Clerk.user) {
+        window.location.replace("projects.html");
+        return;
+      }
+
+      document.body.style.display = "";
+    }
+
+    enforceClerkSession();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      updateDoc,
+      deleteDoc,
+      doc,
+      onSnapshot,
+      query,
+      orderBy,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB2rCOzAyc4zt6QQvBRKfdGJ9nYGmdvZPg",
+      authDomain: "beljocorplbr-bed51.firebaseapp.com",
+      projectId: "beljocorplbr-bed51",
+      storageBucket: "beljocorplbr-bed51.firebasestorage.app",
+      messagingSenderId: "288721107111",
+      appId: "1:288721107111:web:554f08449e88096f930382",
+      measurementId: "G-749Y0118Q3"
+    };
+
+    const CLOUDINARY_CLOUD_NAME = "pypeb1m9";
+    const CLOUDINARY_UPLOAD_PRESET = "adosa9kb";
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const projectsRef = collection(db, "projects");
+
+    const uploadForm = document.getElementById("uploadMediaForm");
+    const uploadInput = document.getElementById("projectMediaInput");
+    const tableBody = document.getElementById("projectMediaTableBody");
+    const uploadError = document.getElementById("uploadError");
+
+    let projectsCache = [];
+
+    async function requireClerkAdmin() {
+      if (!window.Clerk) {
+        window.location.replace("projects.html");
+        return false;
+      }
+
+      await window.Clerk.load();
+      if (!window.Clerk.user) {
+        window.location.replace("projects.html");
+        return false;
+      }
+
+      return true;
+    }
+
+    function escapeHtml(value) {
+      const element = document.createElement("span");
+      element.textContent = value || "";
+      return element.innerHTML;
+    }
+
+    async function uploadToCloudinary(file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`,
+        { method: "POST", body: formData }
+      );
+
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+
+      const result = await response.json();
+      return {
+        mediaUrl: result.secure_url,
+        mediaType: result.resource_type === "video" ? "Video" : "Photo",
+        publicId: result.public_id
+      };
+    }
+
+    function renderTable(search = "") {
+      const queryValue = String(search).trim().toLowerCase();
+
+      const filtered = projectsCache.filter(item =>
+        [item.title, item.location, item.type]
+          .join(" ")
+          .toLowerCase()
+          .includes(queryValue)
+      );
+
+      if (!filtered.length) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="6" class="text-center text-muted py-5">
+              <i class="bi bi-images fs-2 d-block mb-2"></i>
+              No project media found.
+            </td>
+          </tr>`;
+        return;
+      }
+
+      tableBody.innerHTML = filtered.map(item => `
+        <tr>
+          <td class="ps-3">
+            ${item.type === "Video"
+              ? `<video src="${item.mediaUrl}" muted preload="metadata"
+                   style="width:72px;height:52px;object-fit:cover;border-radius:6px"></video>`
+              : `<img src="${item.mediaUrl}" alt="${escapeHtml(item.title)}"
+                   style="width:72px;height:52px;object-fit:cover;border-radius:6px">`}
+          </td>
+          <td><strong>${escapeHtml(item.title)}</strong></td>
+          <td>${escapeHtml(item.location || "-")}</td>
+          <td>
+            <span class="badge ${item.type === "Video" ? "text-bg-danger" : "text-bg-primary"}">
+              ${escapeHtml(item.type)}
+            </span>
+          </td>
+          <td>${item.createdAt?.toDate?.().toLocaleDateString() || "Just now"}</td>
+          <td class="text-end pe-3">
+            <button type="button" class="btn btn-sm btn-outline-primary me-1"
+                    data-action="edit" data-id="${item.id}">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger"
+                    data-action="delete" data-id="${item.id}">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    uploadForm.addEventListener("submit", async event => {
+      event.preventDefault();
+
+      const file = uploadInput.files?.[0];
+      if (!file) {
+        uploadError.textContent = "Please choose a file.";
+        uploadError.classList.remove("d-none");
+        return;
+      }
+
+      const submitButton = uploadForm.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      submitButton.textContent = "Uploading...";
+
+      try {
+        const uploaded = await uploadToCloudinary(file);
+
+        await addDoc(projectsRef, {
+          title: document.getElementById("projectMediaTitle").value.trim() || file.name,
+          location: document.getElementById("projectMediaLocation").value.trim(),
+          mediaUrl: uploaded.mediaUrl,
+          publicId: uploaded.publicId,
+          type: uploaded.mediaType,
+          uploadedBy: window.Clerk.user?.primaryEmailAddress?.emailAddress || "Admin",
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+
+        uploadForm.reset();
+        uploadError.classList.add("d-none");
+
+        bootstrap.Modal.getInstance(
+          document.getElementById("uploadProjectMediaModal")
+        )?.hide();
+      } catch (error) {
+        console.error(error);
+        uploadError.textContent = "Upload failed. Check the file and try again.";
+        uploadError.classList.remove("d-none");
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Upload";
+      }
+    });
+
+    tableBody.addEventListener("click", event => {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
+
+      const project = projectsCache.find(item => item.id === button.dataset.id);
+      if (!project) return;
+
+      if (button.dataset.action === "edit") {
+        document.getElementById("editProjectId").value = project.id;
+        document.getElementById("editProjectTitle").value = project.title || "";
+        document.getElementById("editProjectLocation").value = project.location || "";
+        document.getElementById("editProjectType").value = project.type || "Photo";
+
+        bootstrap.Modal.getOrCreateInstance(
+          document.getElementById("editProjectMediaModal")
+        ).show();
+      }
+
+      if (button.dataset.action === "delete") {
+        document.getElementById("deleteProjectId").value = project.id;
+
+        bootstrap.Modal.getOrCreateInstance(
+          document.getElementById("deleteProjectMediaModal")
+        ).show();
+      }
+    });
+
+    document.getElementById("saveProjectEditButton").addEventListener("click", async () => {
+      const id = document.getElementById("editProjectId").value;
+      if (!id) return;
+
+      await updateDoc(doc(db, "projects", id), {
+        title: document.getElementById("editProjectTitle").value.trim(),
+        location: document.getElementById("editProjectLocation").value.trim(),
+        type: document.getElementById("editProjectType").value,
+        updatedAt: serverTimestamp()
+      });
+
+      bootstrap.Modal.getInstance(
+        document.getElementById("editProjectMediaModal")
+      )?.hide();
+    });
+
+    document.getElementById("confirmProjectDeleteButton").addEventListener("click", async () => {
+      const id = document.getElementById("deleteProjectId").value;
+      if (!id) return;
+
+      await deleteDoc(doc(db, "projects", id));
+
+      bootstrap.Modal.getInstance(
+        document.getElementById("deleteProjectMediaModal")
+      )?.hide();
+    });
+
+    document.getElementById("headerMediaSearch").addEventListener("input", event => {
+      document.getElementById("tableMediaSearch").value = event.target.value;
+      renderTable(event.target.value);
+    });
+
+    document.getElementById("tableMediaSearch").addEventListener("input", event => {
+      document.getElementById("headerMediaSearch").value = event.target.value;
+      renderTable(event.target.value);
+    });
+
+    document.addEventListener("click", event => {
+      const fullscreenButton = event.target.closest("#btn-fullscreen");
+      if (!fullscreenButton) return;
+
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
+    const authenticated = await requireClerkAdmin();
+    if (authenticated) {
+      onSnapshot(
+        query(projectsRef, orderBy("createdAt", "desc")),
+        snapshot => {
+          projectsCache = snapshot.docs.map(docSnap => ({
+            id: docSnap.id,
+            ...docSnap.data()
+          }));
+          renderTable();
+        },
+        error => console.error("Firestore listener failed:", error)
+      );
+    }
+  </script>
+
+  <script>
+    async function signOutAdmin() {
+      if (!window.Clerk) {
+        window.location.replace("projects.html");
+        return;
+      }
+
+      await window.Clerk.load();
+
+      await window.Clerk.signOut({
+        redirectUrl: new URL("projects.html", window.location.href).href
+      });
+    }
+
+    document
+      .getElementById("clerk-signout-button")
+      ?.addEventListener("click", signOutAdmin);
+  </script>
+</body>
+</html>

@@ -31,6 +31,31 @@
   <!-- Template Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
 
+  <style>
+    .portfolio-container .portfolio-item {
+      height: 380px;
+    }
+
+    .portfolio-container .portfolio-content {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .portfolio-container .portfolio-content > img,
+    .portfolio-container .portfolio-content > video {
+      width: 100%;
+      height: 100% !important;
+      object-fit: cover;
+      display: block;
+    }
+
+    @media (max-width: 767.98px) {
+      .portfolio-container .portfolio-item {
+        height: 320px;
+      }
+    }
+  </style>
+
   <!-- =======================================================
   * Template Name: UpConstruction - v1.3.0
   * Template URL: https://bootstrapmade.com/upconstruction-bootstrap-construction-website-template/
@@ -80,6 +105,10 @@
             </ul-->
           </li>
           <li><a href="contact.html">Contact</a></li>
+          <li>
+            <a href="https://sweeping-shrimp-7230.accounts.dev/sign-in"
+               id="clerk-login-link">Login</a>
+          </li>
         </ul>
       </nav><!-- .navbar -->
 
@@ -116,7 +145,8 @@
             <li data-filter=".filter-design">Design</li-->
           </ul><!-- End Projects Filters -->
 
-          <div class="row gy-4 portfolio-container" data-aos="fade-up" data-aos-delay="200">
+          <div class="row gy-4 portfolio-container" id="project-media-container"
+            data-aos="fade-up" data-aos-delay="200">
 
             <!--div class="col-lg-4 col-md-6 portfolio-item filter-remodeling">
               <div class="portfolio-content h-100">
@@ -444,6 +474,204 @@
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
 
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      onSnapshot,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB2rCOzAyc4zt6QQvBRKfdGJ9nYGmdvZPg",
+      authDomain: "beljocorplbr-bed51.firebaseapp.com",
+      projectId: "beljocorplbr-bed51",
+      storageBucket: "beljocorplbr-bed51.firebasestorage.app",
+      messagingSenderId: "288721107111",
+      appId: "1:288721107111:web:554f08449e88096f930382",
+      measurementId: "G-749Y0118Q3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    function escapeProjectText(value) {
+      const element = document.createElement("span");
+      element.textContent = value || "";
+      return element.innerHTML;
+    }
+
+    function getPlayableVideoUrl(url) {
+      if (!url || !url.includes("/video/upload/")) return url || "";
+      if (url.includes("/video/upload/f_auto,vc_auto/")) return url;
+      return url.replace(
+        "/video/upload/",
+        "/video/upload/f_auto,vc_auto/"
+      );
+    }
+
+    function renderUploadedProjects(mediaItems) {
+      const container = document.getElementById("project-media-container");
+      if (!container) return;
+
+      container
+        .querySelectorAll("[data-uploaded-project='true']")
+        .forEach(item => item.remove());
+
+      mediaItems.forEach(item => {
+        const project = document.createElement("div");
+        project.className =
+          "col-lg-4 col-md-6 portfolio-item filter_remodeling uploaded-project";
+        project.setAttribute("data-uploaded-project", "true");
+
+        const title = escapeProjectText(item.title || "Project");
+        const location = escapeProjectText(item.location || "");
+
+        if (item.type === "Video") {
+          const playableUrl = getPlayableVideoUrl(item.mediaUrl);
+
+          project.innerHTML = `
+            <div class="portfolio-content h-100">
+              <video src="${playableUrl}"
+                     class="img-fluid"
+                     controls
+                     playsinline
+                     preload="auto"
+                     style="width:100%;height:100%;object-fit:cover">
+              </video>
+              <div class="portfolio-info">
+                <h4>${title}</h4>
+                <p>${location}</p>
+              </div>
+            </div>`;
+
+          project.querySelector("video")?.addEventListener("error", event => {
+            console.error(
+              "Uploaded video could not play:",
+              playableUrl,
+              event.target.error
+            );
+          });
+        } else {
+          project.innerHTML = `
+            <div class="portfolio-content h-100">
+              <img src="${item.mediaUrl}" class="img-fluid" alt="${title}">
+              <div class="portfolio-info">
+                <h4>${title}</h4>
+                <p>${location}</p>
+                <a href="${item.mediaUrl}" title="${title}"
+                   data-gallery="portfolio-gallery-remodeling"
+                   class="glightbox preview-link">
+                  <i class="bi bi-zoom-in"></i>
+                </a>
+              </div>
+            </div>`;
+        }
+
+        container.appendChild(project);
+      });
+
+      if (window.glightbox) {
+        window.glightbox({ selector: ".glightbox" });
+      }
+
+      if (window.Isotope) {
+        const isotopeContainer = document.querySelector(".portfolio-container");
+        const existingInstance = isotopeContainer
+          ? window.Isotope.data(isotopeContainer)
+          : null;
+
+        if (existingInstance) {
+          existingInstance.layout();
+        } else if (isotopeContainer) {
+          new window.Isotope(isotopeContainer, {
+            itemSelector: ".portfolio-item",
+            layoutMode: "masonry"
+          });
+        }
+      }
+    }
+
+    const projectsQuery = query(
+      collection(db, "projects"),
+      orderBy("createdAt", "desc")
+    );
+
+    onSnapshot(
+      projectsQuery,
+      snapshot => {
+        const projects = snapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+
+        renderUploadedProjects(projects);
+      },
+      error => console.error("Firestore project listener failed:", error)
+    );
+
+    document.querySelectorAll("video").forEach(video => {
+      video.pause();
+    });
+
+    document.addEventListener("hidden.bs.modal", event => {
+      event.target.querySelectorAll("video").forEach(video => {
+        video.pause();
+        video.currentTime = 0;
+        video.removeAttribute("src");
+        video.load();
+      });
+    });
+
+    document.getElementById("clerk-login-link")?.addEventListener("click", event => {
+      event.preventDefault();
+
+      const uploadUrl = new URL("upload.html", window.location.href).href;
+      const signInUrl = "https://sweeping-shrimp-7230.accounts.dev/sign-in";
+
+      window.location.href =
+        `${signInUrl}?redirect_url=${encodeURIComponent(uploadUrl)}`;
+    });
+  </script>
+
+  <!-- Clerk authentication -->
+  <script
+    async
+    crossorigin="anonymous"
+    data-clerk-publishable-key="pk_test_c3dlZXBpbmctc2hyaW1wLTcyMzAuY2xlcmsuYWNjb3VudHMuZGV2JA"
+    src="https://sweeping-shrimp-7230.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js">
+  </script>
+
+  <script>
+    async function handleAdminLoginClick(event) {
+      event.preventDefault();
+
+      const uploadUrl = new URL("upload.html", window.location.href).href;
+
+      if (!window.Clerk) {
+        alert("Authentication service is still loading. Please try again.");
+        return;
+      }
+
+      await window.Clerk.load();
+
+      if (window.Clerk.user) {
+        window.location.assign(uploadUrl);
+        return;
+      }
+
+      await window.Clerk.openSignIn({
+        forceRedirectUrl: uploadUrl,
+        fallbackRedirectUrl: uploadUrl
+      });
+    }
+
+    document
+      .getElementById("clerk-login-link")
+      ?.addEventListener("click", handleAdminLoginClick);
+  </script>
 </body>
 
 </html>
